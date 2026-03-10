@@ -1,36 +1,10 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lomda Engineering Journey
 
-## Getting Started
+This repository is the technical companion to the book **AI Developer Fitness**. It is not a complete, working application. Instead, it is a Flawed Code Sandbox designed to train your architectural reading and mental debugging skills.
 
-First, run the development server:
+## Navigation
+Do not run this code. Read it. Each folder corresponds to a chapter in the book:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Chapter 2 (Architectural Reading):** Navigate to `app/api/chapter-02/`. Review the video progress tracking implementation. Find the rate-limiting risk.
+* **Chapter 3 (Mental Debugging):** Navigate to `app/api/chapter-03/`. Review the course purchase implementation. Run a mental simulation of two concurrent requests to find the race condition.
+* **Final Project:** See the open Pull Request in this repository titled "Feature: Auto-Generate Quiz via AI".
