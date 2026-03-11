@@ -7,14 +7,30 @@
  * 4. Suggest an architectural fix for each scenario.
  */
 
+interface Student {
+  id: string;
+  credits: number;
+  isPremium: boolean;
+  hasReceivedBonus: boolean;
+}
+
 // Mock Database & Services
 const db = {
   students: {
-    findById: async (id: string) => ({ id, credits: 100, isPremium: false, hasReceivedBonus: false }),
-    update: async (id: string, data: any) => { console.log(`DB: Updated student ${id}`, data); }
+    findById: async (id: string): Promise<Student> => ({ 
+      id, 
+      credits: 100, 
+      isPremium: false, 
+      hasReceivedBonus: false 
+    }),
+    update: async (id: string, data: Partial<Student>) => { 
+      console.log(`DB: Updated student ${id}`, data); 
+    }
   },
   courses: {
-    update: async (id: string, data: any) => { console.log(`DB: Updated course ${id}`, data); }
+    update: async (id: string, data: Record<string, unknown>) => { 
+      console.log(`DB: Updated course ${id}`, data); 
+    }
   }
 };
 
@@ -25,34 +41,32 @@ const stripe = {
   }
 };
 
-const notificationService = {
+// Exporting to satisfy 'no-unused-vars' and allow external testing
+export const notificationService = {
   cancelCourseReminders: async (courseId: string) => {
     console.log(`Notifications: Cancelled reminders for ${courseId}`);
   }
 };
 
 // --- SCENARIO 1: The Partial Charge (Partial Failure) ---
-async function purchasePremium(studentId: string) {
-  // Step 1: External Charge
+export async function purchasePremium(studentId: string) {
   const chargeResult = await stripe.charge(49);
   
   if (chargeResult.success) {
-    // Step 2: Internal DB Update
-    // WHAT IF: The database is down right here?
+    // BREAKPOINT: If DB update fails here, user is charged but not upgraded.
     await db.students.update(studentId, { isPremium: true });
     return { status: "success" };
   }
 }
 
 // --- SCENARIO 2: The Bonus Race (Race Condition) ---
-async function grantOnboardingBonus(studentId: string) {
+export async function grantOnboardingBonus(studentId: string) {
   const student = await db.students.findById(studentId);
 
-  // Agent logic: Check then update
   if (!student.hasReceivedBonus) {
     const newBalance = student.credits + 100;
     
-    // WHAT IF: Another request executes this exact line simultaneously?
+    // BREAKPOINT: Parallel requests can both pass the IF check before either updates the DB.
     await db.students.update(studentId, { 
       credits: newBalance, 
       hasReceivedBonus: true 
@@ -61,21 +75,14 @@ async function grantOnboardingBonus(studentId: string) {
 }
 
 // --- SCENARIO 3: The Logic Zombie (Inconsistent State) ---
-async function archiveCourse(courseId: string) {
+export async function archiveCourse(courseId: string) {
   console.log(`Archiving course ${courseId}...`);
   
-  // Agent logic: Focus only on the 'Course' entity
   await db.courses.update(courseId, { 
     status: 'archived', 
     archivedAt: new Date().toISOString() 
   });
 
-  // WHAT IF: The notification service is still sending "Pending Task" reminders for this course?
+  // BREAKPOINT: The course status changed locally, but no message was sent to notificationService.
   return { status: "archived" };
 }
-
-/**
- * ARCHITECTURAL CHALLENGE:
- * How would you refactor 'archiveCourse' to ensure the Notification Service 
- * is always synced, even if the process fails mid-way?
- */
